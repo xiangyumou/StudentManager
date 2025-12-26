@@ -11,3 +11,4 @@
 [SQL: INSERT INTO login_log (identifier, login_time, succeed, detail, dual_authentication) VALUES (?, ?, ?, ?, ?)]
 [parameters: (None, '2025-12-26 22:59:08.137531', 0, 'Account User Not Found', 0)]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-12-26 23:01:36,359 - src.services.user_service - INFO - User admin created successfully.
