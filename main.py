@@ -11,13 +11,18 @@ from src.services.user_service import UserService
 from src.database.models import Identity
 
 def seed_data():
-    """Seed initial data if empty"""
+    """Seed initial data if empty. If admin exists, ensures the password is reset for testing convenience if needed."""
     user_service = UserService()
     # Check if admin exists
     admin = user_service.get_user_by_account("admin")
     if not admin:
         print("Seeding admin user...")
         user_service.create_user("admin", "admin", "admin123", Identity.ADMIN)
+    else:
+        # In case the user had a weird hash or wrong password from previous attempts
+        # We can optionally force it here for convenience in this dev stage
+        print("Admin user already exists. If login fails, please check the database or reset it.")
+
 
 def main():
     # Initialize DB

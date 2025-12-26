@@ -7,7 +7,7 @@ A Python-based Student Management System built with PyQt5 and SQLAlchemy.
 -   Role-based Access Control (Student, Teacher, Admin, etc.)
 -   Student Information Management
 -   Secure Password Hashing
--   Data persistence with SQLite (extensible to MySQL)
+-   Data persistence with SQLite
 
 ## Structure
 The project has been refactored into a modern structure:
@@ -18,9 +18,9 @@ student-manage-system/
 │   ├── database/       # ORM Models (SQLAlchemy) & DB Connection
 │   ├── services/       # Business Logic (Auth, User Management)
 │   ├── ui/             # PyQt5 User Interface
-│   ├── utils/          # Logging, Config
-│   └── main.py         # Application Entry Point
+│   └── utils/          # Logging, Config
 ├── tests/              # Unit Tests
+├── main.py             # Application Entry Point
 ├── requirements.txt    # Dependencies
 └── README.md
 ```
@@ -34,7 +34,7 @@ student-manage-system/
 
 2.  **Run the Application**:
     ```bash
-    python -m src.main
+    python main.py
     ```
     *Note: On the first run, the system will automatically create a local `student_system.db` SQLite database and seed an initial Admin user.*
 
@@ -56,3 +56,4 @@ Run automated tests with `pytest`:
 ```bash
 pytest tests/
 ```
+
