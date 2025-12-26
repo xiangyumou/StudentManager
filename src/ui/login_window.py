@@ -46,8 +46,8 @@ class LoginWindow(QDialog):
         self.setLayout(layout)
 
     def handle_login(self):
-        account = self.username_input.text()
-        password = self.password_input.text()
+        account = self.username_input.text().strip()
+        password = self.password_input.text().strip()
         
         status, user, msg = self.auth_service.login(account, password)
         
