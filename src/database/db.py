@@ -20,4 +20,8 @@ class Database:
     def init_db(self):
         Base.metadata.create_all(self.engine)
 
+    def reset_engine(self, new_url):
+        self.engine = create_engine(new_url, echo=Config.DEBUG)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+
 db = Database()

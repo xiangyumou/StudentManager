@@ -3,31 +3,30 @@ from src.database.db import db, Base
 from src.database.models import User, Identity
 from src.services.user_service import UserService
 from src.services.auth_service import AuthService
+from src.config import Config
 import os
 
-# Use an in-memory SQLite DB for testing
-TEST_DB_URL = "sqlite:///:memory:"
+# Override Config for testing
+Config.DATABASE_URL = "sqlite:///:memory:"
 
 @pytest.fixture(scope="module")
 def setup_database():
-    # Override the engine path or just ensure we treat current DB as disposable if using file
-    # For simplicity in this env, let's use the actual DB setup but ensure we start fresh or use a separate test db file
-    # Here we will re-init the global db with memory for safety
-    from sqlalchemy import create_engine
-    from sqlalchemy.orm import sessionmaker
+    # Use reset_engine to swap the singleton's engine to memory
+    db.reset_engine(Config.DATABASE_URL)
+    db.init_db()
     
-    engine = create_engine(TEST_DB_URL)
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    return Session()
+    yield
+    
+    # Teardown
+    Base.metadata.drop_all(db.engine)
 
 @pytest.fixture
 def user_service(setup_database):
-    return UserService(session=setup_database)
+    return UserService()
 
 @pytest.fixture
 def auth_service(setup_database):
-    return AuthService(session=setup_database)
+    return AuthService()
 
 def test_create_user(user_service):
     success, msg = user_service.create_user(
@@ -47,7 +46,14 @@ def test_create_user(user_service):
     )
     assert success is False
 
-def test_login_success(auth_service):
+def test_login_success(auth_service, user_service):
+    # Ensure user exists (tests might run validation order, so best to create again or rely on fixture state)
+    # Since we use module scope for DB but function scope for services (stateless), DB persists across tests in this file.
+    # But test_create_user runs first usually.
+    # Let's simple check if user needs creating
+    if not user_service.get_user_by_account("admin"):
+        user_service.create_user("admin", "admin", "password123", Identity.ADMIN)
+
     status, user, msg = auth_service.login("admin", "password123")
     assert status == 3
     assert user.account == "admin"

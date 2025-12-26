@@ -7,17 +7,18 @@ import bcrypt
 logger = setup_logger(__name__)
 
 class UserService:
-    def __init__(self, session: Session = None):
-        self.session = session or db.get_session()
+    def __init__(self):
+        pass
 
     def create_user(self, identifier, account, password, identity: Identity, **kwargs):
         """
         Creates a new user. 
         **kwargs handles specific role data (e.g. major_id for students)
         """
+        session = db.get_session()
         try:
             # Check if user exists
-            existing_user = self.session.query(User).filter((User.identifier == identifier) | (User.account == account)).first()
+            existing_user = session.query(User).filter((User.identifier == identifier) | (User.account == account)).first()
             if existing_user:
                 return False, "User already exists"
 
@@ -30,7 +31,7 @@ class UserService:
                 password=hashed_pw,
                 identity=identity
             )
-            self.session.add(new_user)
+            session.add(new_user)
             
             # Handle specifics (Example: Student)
             if identity == Identity.STUDENT:
@@ -41,17 +42,21 @@ class UserService:
                     class_id=kwargs.get('class_id', 0),
                     enrollment_time=kwargs.get('enrollment_time', '')
                 )
-                self.session.add(student)
+                session.add(student)
             
-            self.session.commit()
+            session.commit()
             logger.info(f"User {account} created successfully.")
             return True, "User created successfully"
         except Exception as e:
-            self.session.rollback()
+            session.rollback()
             logger.error(f"Error creating user: {e}")
             return False, f"Server Error: {e}"
         finally:
-            self.session.close()
+            session.close()
 
     def get_user_by_account(self, account):
-        return self.session.query(User).filter_by(account=account).first()
+        session = db.get_session()
+        try:
+            return session.query(User).filter_by(account=account).first()
+        finally:
+            session.close()

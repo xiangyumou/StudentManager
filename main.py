@@ -1,8 +1,8 @@
 import sys
 import os
 
-# Add src to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add src to path is not strictly needed if running from root as package, but ensuring . is in path helps
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from PyQt5.QtWidgets import QApplication
 from src.database.db import db
@@ -12,14 +12,12 @@ from src.database.models import Identity
 
 def seed_data():
     """Seed initial data if empty"""
-    session = db.get_session()
-    user_service = UserService(session)
+    user_service = UserService()
     # Check if admin exists
     admin = user_service.get_user_by_account("admin")
     if not admin:
         print("Seeding admin user...")
         user_service.create_user("admin", "admin", "admin123", Identity.ADMIN)
-    session.close()
 
 def main():
     # Initialize DB
