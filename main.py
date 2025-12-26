@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication
 from src.database.db import db
 from src.ui.login_window import LoginWindow
 from src.services.user_service import UserService
-from src.database.models import Identity
+from src.database.models import Identity, User
 
 import argparse
 
